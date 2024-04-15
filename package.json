@@ -11,7 +11,6 @@
   "dependencies": {
     "@schedule-x/theme-default": "^1.30.0",
     "@schedule-x/vue": "^1.26.1",
-    "@vercel/speed-insights": "^1.0.10",
     "@vitejs/plugin-vue": "^5.0.4",
     "axios": "^1.6.8",
     "chart.js": "^4.4.2",
