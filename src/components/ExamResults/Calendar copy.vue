@@ -1,9 +1,11 @@
 <template>
   <div>
-    <ScheduleXCalendar v-if="calendarApp" :calendar-app="calendarApp" />
+    <ScheduleXCalendar
+      v-if="calendarApp !== null"
+      :calendar-app="calendarApp"
+    />
   </div>
 </template>
-
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
@@ -41,14 +43,11 @@ const createEvents = (results) => {
   return results.map((result) => {
     const meetingDateStr = result.Meeting.meeting_date;
     const meetingDate = new Date(meetingDateStr);
-    const start = meetingDate.toISOString().slice(0, 16).replace("T", " "); // Format: YYYY-MM-DD HH:mm
-    const end = new Date(meetingDate.getTime() + 60 * 45 * 1000)
-      .toISOString()
-      .slice(0, 16)
-      .replace("T", " "); // Add one hour and format: YYYY-MM-DD HH:mm
+    const start = meetingDate.toISOString(); // แปลงเป็น ISO string เพื่อใช้ในปฏิทิน
+    const end = new Date(meetingDate.getTime() + 60 * 60 * 1000).toISOString(); // เพิ่มหนึ่งชั่วโมงแล้วแปลงเป็น ISO string
     return {
       id: result._id,
-      title: `${result.Position_applied} | ${result.Meeting_result}`,
+      title: `${result.Position_applied} (${result.Meeting_result}) | ${meetingDateStr}`,
       start: start,
       end: end,
     };
@@ -68,11 +67,3 @@ watch(examResults, (newVal) => {
   }
 });
 </script>
-
-<style scoped>
-.calendar-container {
-  width: 50%;
-  height: 400px;
-  max-height: 30vh;
-}
-</style>

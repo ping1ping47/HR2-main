@@ -75,28 +75,11 @@
                 required
                 min="0"
                 max="10"
-                step="1"
+                step="0.1"
               />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-            <div>
-              <label
-                for="Result"
-                class="block mb-2 text-sm font-medium text-gray-900"
-              >
-                ผลลัพธ์
-              </label>
-              <input
-                v-model="formData.Result"
-                type="text"
-                name="Result"
-                id="Result"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                placeholder="ป้อน ผลลัพธ์"
-                required
-              />
+              <span class="text-sm text-gray-500">{{
+                calculateScore(formData.Score)
+              }}</span>
             </div>
           </div>
 
@@ -138,16 +121,10 @@ export default {
       formData: {
         Position_applied: "",
         Score: null,
-        Result: "",
+        Result: "0/10",
       },
       ExamType: [],
     };
-  },
-
-  computed: {
-    calculatedResult() {
-      return (this.formData.Score / 10).toFixed(2);
-    },
   },
 
   mounted() {
@@ -155,10 +132,18 @@ export default {
   },
 
   methods: {
+    calculateScore(score) {
+      if (score === null || score === undefined || score === "") {
+        return "0/10";
+      } else {
+        return (score / 1).toFixed() + "/10";
+      }
+    },
+
     async fetchPostTypes() {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_POST}/exam-type`
+          `${import.meta.env.VITE_API_EXAM}/exam-type`
         );
         if (response.data.status) {
           this.ExamType = response.data.data;
@@ -172,6 +157,20 @@ export default {
 
     async addPostRequest() {
       try {
+        if (
+          !this.formData.Score ||
+          this.formData.Score < 0 ||
+          this.formData.Score > 10
+        ) {
+          Swal.fire(
+            "Invalid Score",
+            "Please enter a score between 0 and 10.",
+            "error"
+          );
+          return;
+        } else {
+          this.formData.Result = this.calculateScore(this.formData.Score);
+        }
         const formData = this.formData;
 
         await Swal.fire({
@@ -187,7 +186,7 @@ export default {
           if (result.isConfirmed) {
             await axios.post(
               `${
-                import.meta.env.VITE_API_POST
+                import.meta.env.VITE_API_EXAMRESULTS
               }/examresults/insert-examresults/`,
               formData
             );
@@ -208,7 +207,7 @@ export default {
       this.formData = {
         Position_applied: "",
         Score: null,
-        Result: "",
+        Result: "0/10",
       };
     },
   },
